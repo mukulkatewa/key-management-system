@@ -1,29 +1,52 @@
 import Fastify from 'fastify';
+import rateLimit from '@fastify/rate-limit';
 import { SigningService } from './services/signing.service';
 import { apiKeyAuth } from './middleware/auth.middleware';
 import * as dotenv from 'dotenv';
 import { MPCSigningService } from './services/mpc/mpc-signing.service';
 import { isMPCEnabled } from './config/mpc.config';
+import { 
+  rateLimitConfig, 
+  walletGenerationRateLimit, 
+  signingRateLimit,
+  mpcWalletGenerationRateLimit,
+  readOperationsRateLimit,
+  healthCheckRateLimit
+} from './config/rate-limit.config';
+import { RotationService } from './services/rotation.service';
 
 dotenv.config();
 
 const fastify = Fastify({ logger: true });
 const signingService = new SigningService();
 const mpcSigningService = new MPCSigningService();
+const rotationService = new RotationService();
+
+// Register rate limiting plugin globally (100 requests per 5 minutes)
+fastify.register(rateLimit, rateLimitConfig);
 
 // ============================================================================
 // STANDARD ENDPOINTS (Single-Key KMS)
 // ============================================================================
 
-// Health check (no auth required)
-fastify.get('/health', async (request, reply) => {
+// Health check (no auth required, lenient rate limit)
+fastify.get('/health', { 
+  config: { 
+    rateLimit: healthCheckRateLimit // 1000 per 5 minutes
+  } 
+}, async (request, reply) => {
   return { status: 'ok', service: 'hyperliquid-kms' };
 });
 
-// Generate new wallet (PROTECTED)
+// Generate new wallet (PROTECTED + STRICT RATE LIMIT)
 fastify.post<{
   Body: { walletId: string; metadata?: any }
-}>('/wallets/generate', { preHandler: apiKeyAuth }, async (request, reply) => {
+}>('/wallets/generate', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: walletGenerationRateLimit // 5 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId, metadata } = request.body;
     
@@ -47,10 +70,15 @@ fastify.post<{
   }
 });
 
-// Sign message/transaction (PROTECTED)
+// Sign message/transaction (PROTECTED + SIGNING RATE LIMIT)
 fastify.post<{
   Body: { walletId: string; message: string }
-}>('/wallets/sign', { preHandler: apiKeyAuth }, async (request, reply) => {
+}>('/wallets/sign', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: signingRateLimit // 50 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId, message } = request.body;
     
@@ -72,10 +100,15 @@ fastify.post<{
   }
 });
 
-// Sign Hyperliquid order (PROTECTED)
+// Sign Hyperliquid order (PROTECTED + SIGNING RATE LIMIT)
 fastify.post<{
   Body: { walletId: string; orderPayload: any }
-}>('/wallets/sign-order', { preHandler: apiKeyAuth }, async (request, reply) => {
+}>('/wallets/sign-order', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: signingRateLimit // 50 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId, orderPayload } = request.body;
     
@@ -97,10 +130,14 @@ fastify.post<{
   }
 });
 
-// Get public key (read-only, optional auth)
+// Get public key (read-only, lenient rate limit)
 fastify.get<{
   Params: { walletId: string }
-}>('/wallets/:walletId/public-key', async (request, reply) => {
+}>('/wallets/:walletId/public-key', {
+  config: {
+    rateLimit: readOperationsRateLimit // 200 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId } = request.params;
     const publicKey = await signingService.getPublicKey(walletId);
@@ -116,8 +153,12 @@ fastify.get<{
   }
 });
 
-// List all wallets (read-only, optional auth)
-fastify.get('/wallets', async (request, reply) => {
+// List all wallets (read-only, lenient rate limit)
+fastify.get('/wallets', {
+  config: {
+    rateLimit: readOperationsRateLimit // 200 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const wallets = await signingService.listWallets();
     
@@ -133,11 +174,106 @@ fastify.get('/wallets', async (request, reply) => {
 });
 
 // ============================================================================
+// WALLET ROTATION ENDPOINTS
+// ============================================================================
+
+// Rotate wallet to new version
+fastify.post<{
+  Body: { walletId: string; reason?: string }
+}>('/wallets/rotate', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: { max: 3, timeWindow: '5 minutes' } // Very restrictive
+  }
+}, async (request, reply) => {
+  try {
+    const { walletId, reason } = request.body;
+    
+    if (!walletId) {
+      return reply.code(400).send({ error: 'walletId is required' });
+    }
+
+    const result = await rotationService.rotateWallet(walletId, reason);
+    
+    return {
+      success: true,
+      rotation: result
+    };
+  } catch (error: any) {
+    fastify.log.error(error);
+    return reply.code(500).send({ error: error.message });
+  }
+});
+
+// Get rotation history
+fastify.get<{
+  Params: { walletId: string }
+}>('/wallets/:walletId/rotation-history', {
+  config: {
+    rateLimit: readOperationsRateLimit
+  }
+}, async (request, reply) => {
+  try {
+    const { walletId } = request.params;
+    
+    const history = await rotationService.getRotationHistory(walletId);
+    
+    if (!history) {
+      return reply.code(404).send({ 
+        error: 'No rotation history found. Wallet may not exist or not migrated to versioned system.' 
+      });
+    }
+    
+    return {
+      success: true,
+      walletId,
+      history
+    };
+  } catch (error: any) {
+    fastify.log.error(error);
+    return reply.code(404).send({ error: error.message });
+  }
+});
+
+// Migrate legacy wallet to versioned system
+fastify.post<{
+  Body: { walletId: string }
+}>('/wallets/migrate', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: { max: 5, timeWindow: '5 minutes' }
+  }
+}, async (request, reply) => {
+  try {
+    const { walletId } = request.body;
+    
+    if (!walletId) {
+      return reply.code(400).send({ error: 'walletId is required' });
+    }
+
+    await rotationService.migrateLegacyWallet(walletId);
+    
+    return {
+      success: true,
+      message: `Wallet ${walletId} migrated to versioned system`,
+      walletId
+    };
+  } catch (error: any) {
+    fastify.log.error(error);
+    return reply.code(500).send({ error: error.message });
+  }
+});
+
+// ============================================================================
 // MPC ENDPOINTS (Multi-Party Computation with Threshold Signatures)
 // ============================================================================
 
 // MPC Status endpoint
-fastify.get('/mpc/status', async (request, reply) => {
+fastify.get('/mpc/status', {
+  config: {
+    rateLimit: healthCheckRateLimit // 1000 per 5 minutes
+  }
+}, async (request, reply) => {
   return {
     mpcEnabled: isMPCEnabled(),
     threshold: process.env.MPC_THRESHOLD_REQUIRED,
@@ -149,10 +285,15 @@ fastify.get('/mpc/status', async (request, reply) => {
   };
 });
 
-// Generate MPC wallet (PROTECTED)
+// Generate MPC wallet (PROTECTED + VERY STRICT RATE LIMIT)
 fastify.post<{
   Body: { walletId: string; metadata?: any }
-}>('/mpc/wallets/generate', { preHandler: apiKeyAuth }, async (request, reply) => {
+}>('/mpc/wallets/generate', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: mpcWalletGenerationRateLimit // 3 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId, metadata } = request.body;
     
@@ -184,10 +325,15 @@ fastify.post<{
   }
 });
 
-// Sign message with MPC (PROTECTED)
+// Sign message with MPC (PROTECTED + SIGNING RATE LIMIT)
 fastify.post<{
   Body: { walletId: string; message: string }
-}>('/mpc/wallets/sign', { preHandler: apiKeyAuth }, async (request, reply) => {
+}>('/mpc/wallets/sign', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: signingRateLimit // 50 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId, message } = request.body;
     
@@ -216,10 +362,15 @@ fastify.post<{
   }
 });
 
-// Sign Hyperliquid order with MPC (PROTECTED)
+// Sign Hyperliquid order with MPC (PROTECTED + SIGNING RATE LIMIT)
 fastify.post<{
   Body: { walletId: string; orderPayload: any }
-}>('/mpc/wallets/sign-order', { preHandler: apiKeyAuth }, async (request, reply) => {
+}>('/mpc/wallets/sign-order', { 
+  preHandler: apiKeyAuth,
+  config: {
+    rateLimit: signingRateLimit // 50 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId, orderPayload } = request.body;
     
@@ -251,7 +402,11 @@ fastify.post<{
 // Get MPC wallet public key
 fastify.get<{
   Params: { walletId: string }
-}>('/mpc/wallets/:walletId/public-key', async (request, reply) => {
+}>('/mpc/wallets/:walletId/public-key', {
+  config: {
+    rateLimit: readOperationsRateLimit // 200 per 5 minutes
+  }
+}, async (request, reply) => {
   try {
     const { walletId } = request.params;
     
@@ -294,6 +449,17 @@ const start = async () => {
 🌍 Region: ${process.env.AWS_REGION}
 🔑 API Auth: ${authEnabled}
 🔒 MPC Mode: ${mpcStatus}
+🚦 Rate Limiting: Enabled (100 req / 5 min globally)
+🔄 Key Rotation: Enabled (annual rotation recommended)
+
+Rate Limits (per 5 minutes):
+  - Global: 100 requests
+  - Health Checks: 1000 requests
+  - Wallet Generation: 5 requests
+  - MPC Wallet Generation: 3 requests
+  - Wallet Rotation: 3 requests
+  - Signing Operations: 50 requests
+  - Read Operations: 200 requests
 
 Available Endpoints:
   Standard KMS:
@@ -302,6 +468,11 @@ Available Endpoints:
     POST /wallets/sign-order
     GET  /wallets/:id/public-key
     GET  /wallets
+  
+  Key Rotation:
+    POST /wallets/rotate
+    GET  /wallets/:id/rotation-history
+    POST /wallets/migrate
   
   MPC Enhanced:
     GET  /mpc/status
