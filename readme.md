@@ -23,7 +23,6 @@ Sign Transaction
 ↓
 Return Signature
 
-text
 
 ### MPC Enhanced Architecture
 
@@ -41,8 +40,6 @@ Sign Transaction
 Destroy reconstructed key
 ↓
 Return Signature
-
-text
 
 ## Key Features
 
@@ -103,8 +100,6 @@ Edit .env with your AWS credentials
 Start service
 npm run dev
 
-text
-
 ### Configuration
 
 Edit `.env` file:
@@ -132,8 +127,6 @@ MPC_THRESHOLD_TOTAL=3
 Secrets Manager
 SECRETS_PREFIX=hyperliquid/wallets/
 
-text
-
 ## API Documentation
 
 ### Standard KMS Endpoints
@@ -151,8 +144,6 @@ Content-Type: application/json
 }
 }
 
-text
-
 Response:
 {
 "success": true,
@@ -163,8 +154,6 @@ Response:
 }
 }
 
-text
-
 #### Sign Message
 POST /wallets/sign
 Headers: X-API-Key: <your-api-key>
@@ -174,8 +163,6 @@ Content-Type: application/json
 "walletId": "my-wallet",
 "message": "transaction_data"
 }
-
-text
 
 #### Sign Hyperliquid Order
 POST /wallets/sign-order
@@ -194,24 +181,17 @@ Content-Type: application/json
 }
 }
 
-text
 
 #### Get Public Key
 GET /wallets/:walletId/public-key
 
-text
-
 #### List Wallets
 GET /wallets
-
-text
 
 ### MPC Enhanced Endpoints
 
 #### Check MPC Status
 GET /mpc/status
-
-text
 
 Response:
 {
@@ -221,8 +201,6 @@ Response:
 "algorithm": "Shamir's Secret Sharing",
 "description": "2-of-3 threshold signature scheme"
 }
-
-text
 
 #### Generate MPC Wallet
 POST /mpc/wallets/generate
@@ -236,8 +214,6 @@ Content-Type: application/json
 "security": "2-of-3 threshold"
 }
 }
-
-text
 
 Response:
 {
@@ -255,8 +231,6 @@ Response:
 }
 }
 
-text
-
 #### Sign with MPC
 POST /mpc/wallets/sign
 Headers: X-API-Key: <your-api-key>
@@ -266,8 +240,6 @@ Content-Type: application/json
 "walletId": "mpc-wallet",
 "message": "transaction_data"
 }
-
-text
 
 #### Sign Order with MPC
 POST /mpc/wallets/sign-order
@@ -279,12 +251,8 @@ Content-Type: application/json
 "orderPayload": { ... }
 }
 
-text
-
 #### Get MPC Wallet Public Key
 GET /mpc/wallets/:walletId/public-key
-
-text
 
 ## Testing
 
@@ -298,8 +266,6 @@ Terminal 2: Run standard KMS tests
 
 Terminal 3: Run MPC tests
 ./tests/mpc-demo-test.sh
-
-text
 
 ### Manual Testing
 
@@ -319,8 +285,6 @@ curl -X POST http://localhost:3000/wallets/sign
 -H "X-API-Key: your_api_key"
 -d '{"walletId": "test-wallet", "message": "test"}'
 
-text
-
 #### MPC Enhanced
 Check MPC status
 curl http://localhost:3000/mpc/status
@@ -336,8 +300,6 @@ curl -X POST http://localhost:3000/mpc/wallets/sign
 -H "Content-Type: application/json"
 -H "X-API-Key: your_api_key"
 -d '{"walletId": "mpc-test-wallet", "message": "test"}'
-
-text
 
 ## Security Features
 
@@ -439,7 +401,6 @@ limitPx: price,
 timestamp: Date.now()
 };
 
-text
 // Use MPC for high-value orders, standard KMS for normal trading
 const signature = highValue 
   ? await this.signOrderMPC('mpc-wallet', orderPayload)
@@ -508,8 +469,6 @@ docker run -d
 --env-file .env.production
 hyperliquid-kms:latest
 
-text
-
 ### Environment-Specific Configuration
 
 For production, update `.env.production`:
@@ -517,8 +476,6 @@ For production, update `.env.production`:
 NODE_ENV=production
 LOG_LEVEL=warn
 MPC_ENABLED=true
-
-text
 
 ### Security Hardening for Production
 
@@ -582,8 +539,6 @@ text
 ]
 }
 
-text
-
 ### KMS Key Configuration
 
 - Key Type: Symmetric
@@ -614,8 +569,6 @@ Enable detailed logging:
 LOG_LEVEL=debug
 NODE_ENV=development
 
-text
-
 ## Development
 
 ### Adding New Endpoints
@@ -635,8 +588,6 @@ Integration tests
 npm run dev
 ./tests/demo-test.sh
 ./tests/mpc-demo-test.sh
-
-text
 
 ## Comparison: Standard vs MPC
 
