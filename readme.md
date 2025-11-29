@@ -455,35 +455,43 @@ text
 ## Project Structure
 
 key-management-service/
+│
 ├── src/
 │ ├── config/
-│ │ ├── aws.config.ts # AWS SDK configuration
-│ │ └── mpc.config.ts # MPC threshold settings
+│ │ ├── aws.config.ts
+│ │ └── mpc.config.ts
+│ │
 │ ├── middleware/
-│ │ └── auth.middleware.ts # API key authentication
+│ │ └── auth.middleware.ts
+│ │
 │ ├── services/
-│ │ ├── kms.service.ts # AWS KMS operations
-│ │ ├── signing.service.ts # Standard wallet signing
+│ │ ├── kms.service.ts
+│ │ ├── signing.service.ts
 │ │ └── mpc/
-│ │ ├── share-manager.service.ts # Shamir Secret Sharing
-│ │ └── mpc-signing.service.ts # MPC wallet operations
+│ │ ├── share-manager.service.ts
+│ │ └── mpc-signing.service.ts
+│ │
 │ ├── models/
-│ │ └── wallet.model.ts # TypeScript interfaces
-│ └── index.ts # Fastify server & routes
+│ │ └── wallet.model.ts
+│ │
+│ └── index.ts
+│
 ├── demo-bot/
-│ ├── hyperliquid-bot.ts # Example trading bot integration
+│ ├── hyperliquid-bot.ts
 │ ├── package.json
 │ └── tsconfig.json
+│
 ├── tests/
-│ ├── demo-test.sh # Standard KMS test suite
-│ └── mpc-demo-test.sh # MPC test suite
-├── .env # Environment configuration
-├── .env.example # Environment template
-├── .gitignore # Git ignore rules
-├── package.json # Node.js dependencies
-├── tsconfig.json # TypeScript configuration
-├── Dockerfile # Docker container config
-└── README.md # This file
+│ ├── demo-test.sh
+│ └── mpc-demo-test.sh
+│
+├── .env
+├── .env.example
+├── .gitignore
+├── package.json
+├── tsconfig.json
+├── Dockerfile
+└── README.md
 
 text
 
