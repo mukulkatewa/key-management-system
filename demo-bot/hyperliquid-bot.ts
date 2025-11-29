@@ -31,7 +31,7 @@ class HyperliquidDemoBot {
    * Initialize bot - create or load wallet
    */
   async initialize() {
-    console.log('🤖 Initializing Hyperliquid Demo Bot...\n');
+    console.log(' Initializing Hyperliquid Demo Bot...\n');
 
     try {
       // Try to get existing wallet
@@ -39,11 +39,11 @@ class HyperliquidDemoBot {
         `${KMS_SERVICE_URL}/wallets/${this.walletId}/public-key`
       );
       this.publicKey = response.data.publicKey;
-      console.log(`✅ Loaded existing wallet: ${this.walletId}`);
+      console.log(` Loaded existing wallet: ${this.walletId}`);
       console.log(`   Public Key: ${this.publicKey}\n`);
     } catch (error) {
       // Wallet doesn't exist, create new one
-      console.log('📝 Wallet not found. Creating new wallet...');
+      console.log(' Wallet not found. Creating new wallet...');
       const response = await axios.post(
         `${KMS_SERVICE_URL}/wallets/generate`,
         {
@@ -59,7 +59,7 @@ class HyperliquidDemoBot {
         }
       );
       this.publicKey = response.data.wallet.publicKey;
-      console.log(`✅ Created new wallet: ${this.walletId}`);
+      console.log(` Created new wallet: ${this.walletId}`);
       console.log(`   Public Key: ${this.publicKey}\n`);
     }
   }
@@ -68,11 +68,11 @@ class HyperliquidDemoBot {
    * Simulate market making strategy
    */
   async runMarketMakingStrategy() {
-    console.log('📊 Starting Market Making Strategy Demo...\n');
+    console.log(' Starting Market Making Strategy Demo...\n');
 
     // Simulate getting market data
     const currentPrice = 45000 + Math.random() * 1000;
-    console.log(`💹 Current BTC Price: $${currentPrice.toFixed(2)}`);
+    console.log(` Current BTC Price: $${currentPrice.toFixed(2)}`);
 
     // Create buy order (bid)
     const buyOrder: HyperliquidOrder = {
@@ -94,7 +94,7 @@ class HyperliquidDemoBot {
       timestamp: Date.now()
     };
 
-    console.log('\n📝 Placing Orders:');
+    console.log('\n Placing Orders:');
     console.log(`   BUY:  ${buyOrder.sz} BTC @ $${buyOrder.limitPx}`);
     console.log(`   SELL: ${sellOrder.sz} BTC @ $${sellOrder.limitPx}`);
 
@@ -102,11 +102,11 @@ class HyperliquidDemoBot {
     const buySignature = await this.signOrder(buyOrder);
     const sellSignature = await this.signOrder(sellOrder);
 
-    console.log('\n✅ Orders Signed Successfully!');
+    console.log('\n Orders Signed Successfully!');
     console.log(`   Buy Order Signature: ${buySignature.substring(0, 20)}...`);
     console.log(`   Sell Order Signature: ${sellSignature.substring(0, 20)}...`);
 
-    console.log('\n📤 Orders Ready to Submit to Hyperliquid Exchange');
+    console.log('\n Orders Ready to Submit to Hyperliquid Exchange');
     console.log('   (In production, would send to Hyperliquid API here)\n');
 
     return { buySignature, sellSignature };
@@ -130,7 +130,7 @@ class HyperliquidDemoBot {
 
       return response.data.signature;
     } catch (error: any) {
-      console.error('❌ Failed to sign order:', error.response?.data || error.message);
+      console.error(' Failed to sign order:', error.response?.data || error.message);
       throw error;
     }
   }
@@ -139,13 +139,13 @@ class HyperliquidDemoBot {
    * Demonstrate key security
    */
   async demonstrateSecurity() {
-    console.log('\n🔒 Security Demonstration:\n');
-    console.log('✅ Private keys stored encrypted in AWS KMS');
-    console.log('✅ Keys decrypted only in-memory during signing');
-    console.log('✅ No private keys in logs, code, or environment variables');
-    console.log('✅ API authentication required for all operations');
-    console.log('✅ AWS IAM controls access to encryption keys');
-    console.log('\n📋 Checking AWS Secrets Manager...');
+    console.log('\n Security Demonstration:\n');
+    console.log(' Private keys stored encrypted in AWS KMS');
+    console.log(' Keys decrypted only in-memory during signing');
+    console.log(' No private keys in logs, code, or environment variables');
+    console.log(' API authentication required for all operations');
+    console.log(' AWS IAM controls access to encryption keys');
+    console.log('\n Checking AWS Secrets Manager...');
     
     const wallets = await axios.get(`${KMS_SERVICE_URL}/wallets`);
     console.log(`   Total Wallets Stored: ${wallets.data.count}`);
@@ -174,11 +174,11 @@ async function runDemo() {
     await bot.demonstrateSecurity();
 
     console.log('\n═══════════════════════════════════════════════════');
-    console.log('✅ Demo Completed Successfully!');
+    console.log(' Demo Completed Successfully!');
     console.log('═══════════════════════════════════════════════════\n');
 
   } catch (error) {
-    console.error('\n❌ Demo failed:', error);
+    console.error('\n Demo failed:', error);
     process.exit(1);
   }
 }

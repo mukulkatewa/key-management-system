@@ -95,7 +95,7 @@ import {
           });
   
           await secretsClient.send(createCommand);
-          console.log(`✅ Stored new wallet: ${walletId}`);
+          console.log(` Stored new wallet: ${walletId}`);
         } catch (err: any) {
           // If secret already exists, update it
           if (err.name === 'ResourceExistsException') {
@@ -106,7 +106,7 @@ import {
             });
   
             await secretsClient.send(updateCommand);
-            console.log(`✅ Updated existing wallet: ${walletId}`);
+            console.log(` Updated existing wallet: ${walletId}`);
           } else {
             throw err;
           }
@@ -184,7 +184,7 @@ import {
         });
   
         await secretsClient.send(createCommand);
-        console.log(`✅ Stored wallet version: ${walletId}-v${version}`);
+        console.log(` Stored wallet version: ${walletId}-v${version}`);
       } catch (error: any) {
         if (error.name === 'ResourceExistsException') {
           // Version already exists, update it
@@ -199,7 +199,7 @@ import {
             })
           });
           await secretsClient.send(updateCommand);
-          console.log(`✅ Updated wallet version: ${walletId}-v${version}`);
+          console.log(` Updated wallet version: ${walletId}-v${version}`);
         } else {
           throw new Error(`Failed to store versioned key: ${error.name}`);
         }
@@ -309,7 +309,7 @@ import {
       const secretName = `${this.secretPrefix}${walletId}-metadata`;
       
       try {
-        console.log(`📝 Storing public key metadata for ${walletId}`);
+        console.log(` Storing public key metadata for ${walletId}`);
         
         const secretData = {
           publicKey: metadata.publicKey,
@@ -331,7 +331,7 @@ import {
         });
   
         await secretsClient.send(command);
-        console.log(`   ✅ Metadata stored: ${secretName}`);
+        console.log(`    Metadata stored: ${secretName}`);
       } catch (error: any) {
         if (error.name === 'ResourceExistsException') {
           // Metadata already exists, update it
@@ -370,7 +370,7 @@ import {
         });
   
         await secretsClient.send(command);
-        console.log(`   ✅ Metadata updated: ${secretName}`);
+        console.log(`    Metadata updated: ${secretName}`);
       } catch (error: any) {
         console.error('Update Metadata Error:', error);
         throw new Error(`Failed to update metadata: ${error.name}`);

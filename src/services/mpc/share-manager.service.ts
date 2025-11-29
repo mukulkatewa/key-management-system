@@ -33,7 +33,7 @@ export class ShareManagerService {
   ): Promise<KeyShare[]> {
     const { required: threshold, total } = mpcConfig.threshold;
     
-    console.log(`\n🔐 MPC: Splitting key into ${total} shares (need ${threshold} to sign)`);
+    console.log(`\n MPC: Splitting key into ${total} shares (need ${threshold} to sign)`);
     console.log(`   Algorithm: Shamir's Secret Sharing`);
     console.log(`   Wallet: ${walletId}`);
 
@@ -48,7 +48,7 @@ export class ShareManagerService {
     // Returns array of hex strings representing shares
     const shares = secrets.share(keyHex, total, threshold);
     
-    console.log(`   ✅ Generated ${shares.length} shares`);
+    console.log(`    Generated ${shares.length} shares`);
 
     const shareMetadata: KeyShare[] = [];
 
@@ -73,10 +73,10 @@ export class ShareManagerService {
         createdAt: new Date().toISOString()
       });
 
-      console.log(`   ✅ Share ${i + 1}/${total} stored: ${shareId}`);
+      console.log(`    Share ${i + 1}/${total} stored: ${shareId}`);
     }
 
-    console.log(`\n🔒 MPC Setup Complete:`);
+    console.log(`\n MPC Setup Complete:`);
     console.log(`   - Key split into ${total} shares`);
     console.log(`   - ${threshold} shares required to sign`);
     console.log(`   - All shares encrypted in AWS Secrets Manager`);
@@ -104,7 +104,7 @@ export class ShareManagerService {
       throw new Error(`Insufficient shares: need at least ${threshold}, requested ${retrieveCount}`);
     }
 
-    console.log(`\n🔓 MPC: Retrieving ${retrieveCount} shares for signing`);
+    console.log(`\n MPC: Retrieving ${retrieveCount} shares for signing`);
 
     const retrievedShares: string[] = [];
     const errors: string[] = [];
@@ -115,7 +115,7 @@ export class ShareManagerService {
         const shareId = `${mpcConfig.shareStoragePrefix}${walletId}-${i}`;
         const share = await this.kmsService.getPrivateKey(shareId);
         retrievedShares.push(share);
-        console.log(`   ✅ Retrieved share ${i}/${total}`);
+        console.log(`    Retrieved share ${i}/${total}`);
       } catch (error: any) {
         errors.push(`Share ${i}: ${error.message}`);
         console.log(`   ⚠️  Share ${i} unavailable, trying next...`);
@@ -129,13 +129,13 @@ export class ShareManagerService {
       );
     }
 
-    console.log(`   ✅ Successfully retrieved ${retrievedShares.length} shares`);
-    console.log(`   🔄 Combining shares using Shamir's algorithm...`);
+    console.log(`    Successfully retrieved ${retrievedShares.length} shares`);
+    console.log(`    Combining shares using Shamir's algorithm...`);
 
     // Combine shares to reconstruct the private key (IN MEMORY ONLY!)
     const reconstructedKeyHex = secrets.combine(retrievedShares);
     
-    console.log(`   ✅ Private key reconstructed in-memory`);
+    console.log(`    Private key reconstructed in-memory`);
     console.log(`   ⚠️  Key will be destroyed after signing\n`);
 
     return reconstructedKeyHex;

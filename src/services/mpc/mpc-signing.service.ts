@@ -19,7 +19,7 @@ export class MPCSigningService {
    * Private key is immediately split into shares and never stored whole
    */
   async generateMPCWallet(walletId: string, metadata?: any): Promise<Wallet> {
-    console.log(`\n🔐 Generating MPC Wallet: ${walletId}`);
+    console.log(`\n Generating MPC Wallet: ${walletId}`);
     
     try {
       // 1. Generate Ed25519 keypair for Hyperliquid
@@ -29,7 +29,7 @@ export class MPCSigningService {
       const privateKeyHex = Buffer.from(keypair.secretKey).toString('hex');
       const publicKeyHex = Buffer.from(keypair.publicKey).toString('hex');
 
-      console.log(`   ✅ Generated Ed25519 keypair`);
+      console.log(`    Generated Ed25519 keypair`);
       console.log(`   Public Key: 0x${publicKeyHex}`);
 
       // 3. Split private key into MPC shares and store
@@ -49,7 +49,7 @@ export class MPCSigningService {
       // 5. Immediately destroy original private key from memory
       keypair.secretKey.fill(0);
 
-      console.log(`\n✅ MPC Wallet Created Successfully!`);
+      console.log(`\n MPC Wallet Created Successfully!`);
       console.log(`   Wallet ID: ${walletId}`);
       console.log(`   Public Key: 0x${publicKeyHex}`);
       console.log(`   Shares: ${shares.length} (${mpcConfig.threshold.required}-of-${mpcConfig.threshold.total} threshold)`);
@@ -67,7 +67,7 @@ export class MPCSigningService {
         }
       };
     } catch (error) {
-      console.error('❌ MPC Wallet Generation Error:', error);
+      console.error(' MPC Wallet Generation Error:', error);
       throw new Error(`Failed to generate MPC wallet: ${error}`);
     }
   }
@@ -79,7 +79,7 @@ export class MPCSigningService {
   async signMessageMPC(request: SignatureRequest): Promise<SignatureResponse> {
     const { walletId, message } = request;
     
-    console.log(`\n🔐 MPC Signing Request`);
+    console.log(`\n MPC Signing Request`);
     console.log(`   Wallet: ${walletId}`);
     console.log(`   Message: ${message.substring(0, 50)}...`);
 
@@ -103,8 +103,8 @@ export class MPCSigningService {
       privateKey.fill(0);
       keypair.secretKey.fill(0);
 
-      console.log(`   ✅ Signature generated`);
-      console.log(`   ✅ Private key destroyed from memory`);
+      console.log(`    Signature generated`);
+      console.log(`    Private key destroyed from memory`);
       console.log(`   Signature: 0x${signatureHex.substring(0, 20)}...\n`);
 
       return {
@@ -113,7 +113,7 @@ export class MPCSigningService {
         walletId
       };
     } catch (error) {
-      console.error('❌ MPC Signing Error:', error);
+      console.error(' MPC Signing Error:', error);
       throw new Error(`Failed to sign with MPC: ${error}`);
     }
   }
@@ -126,7 +126,7 @@ export class MPCSigningService {
       const message = JSON.stringify(orderPayload);
       return await this.signMessageMPC({ walletId, message });
     } catch (error) {
-      console.error('❌ MPC Order Signing Error:', error);
+      console.error(' MPC Order Signing Error:', error);
       throw new Error(`Failed to sign order with MPC: ${error}`);
     }
   }
@@ -137,12 +137,12 @@ export class MPCSigningService {
    */
   async getPublicKey(walletId: string): Promise<string> {
     try {
-      console.log(`📖 Retrieving MPC public key for ${walletId} (fast lookup)`);
+      console.log(` Retrieving MPC public key for ${walletId} (fast lookup)`);
       
       // Try metadata first (fast - no decryption or reconstruction!)
       try {
         const metadata = await this.shareManager.getPublicKeyMetadata(walletId);
-        console.log(`   ✅ Retrieved from metadata (~50ms - no share reconstruction!)`);
+        console.log(`    Retrieved from metadata (~50ms - no share reconstruction!)`);
         return metadata.publicKey;
       } catch (metadataError) {
         // Fallback: reconstruct from shares (legacy MPC wallets)

@@ -34,7 +34,7 @@ WALLET_RESPONSE=$(curl -s -X POST $API_URL/wallets/generate \
   }')
 echo $WALLET_RESPONSE | python3 -m json.tool
 PUBLIC_KEY=$(echo $WALLET_RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin)['wallet']['publicKey'])" 2>/dev/null)
-echo -e "${BLUE}✅ Wallet Created: $PUBLIC_KEY${NC}\n"
+echo -e "${BLUE} Wallet Created: $PUBLIC_KEY${NC}\n"
 
 # Test 3: List All Wallets
 echo -e "${GREEN}Test 3: List All Stored Wallets${NC}"
@@ -86,12 +86,12 @@ curl -s -X POST $API_URL/wallets/sign \
 echo -e "\n"
 
 echo -e "${BLUE}================================================${NC}"
-echo -e "${GREEN}✅ All Tests Completed Successfully!${NC}"
+echo -e "${GREEN} All Tests Completed Successfully!${NC}"
 echo -e "${BLUE}================================================${NC}"
 echo ""
 echo -e "Key Points to Show Recruiter:"
-echo -e "1. ✅ Private keys stored encrypted in AWS KMS"
-echo -e "2. ✅ Keys NEVER exposed in logs or API responses"
-echo -e "3. ✅ Secure signing without key access"
-echo -e "4. ✅ API authentication required for sensitive operations"
-echo -e "5. ✅ Production-ready architecture (tread.fi style)"
+echo -e "1.  Private keys stored encrypted in AWS KMS"
+echo -e "2.  Keys NEVER exposed in logs or API responses"
+echo -e "3.  Secure signing without key access"
+echo -e "4.  API authentication required for sensitive operations"
+echo -e "5.  Production-ready architecture (tread.fi style)"

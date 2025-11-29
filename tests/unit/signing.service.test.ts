@@ -10,7 +10,7 @@ describe('SigningService', () => {
   let mockKmsService: jest.Mocked<KMSService>;
 
   // Valid Ed25519 private key (64 bytes = 128 hex chars)
-  const validPrivateKey = 'a'.repeat(128); // ✅ Correct size!
+  const validPrivateKey = 'a'.repeat(128); //  Correct size!
 
   beforeEach(() => {
     mockKmsService = new KMSService() as jest.Mocked<KMSService>;

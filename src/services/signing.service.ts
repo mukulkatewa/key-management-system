@@ -15,7 +15,7 @@ export class SigningService {
    * Now with version support!
    */
   async generateWallet(walletId: string, metadata?: any): Promise<Wallet> {
-    console.log(`\n🔐 Generating Standard Wallet: ${walletId}`);
+    console.log(`\n Generating Standard Wallet: ${walletId}`);
     
     try {
       // Generate Ed25519 keypair for Hyperliquid
@@ -25,7 +25,7 @@ export class SigningService {
       const privateKeyHex = Buffer.from(keypair.secretKey).toString('hex');
       const publicKeyHex = Buffer.from(keypair.publicKey).toString('hex');
 
-      console.log(`   ✅ Generated Ed25519 keypair`);
+      console.log(`    Generated Ed25519 keypair`);
       console.log(`   Public Key: 0x${publicKeyHex}`);
 
       const version = 1; // Initial version
@@ -56,11 +56,11 @@ export class SigningService {
 
       await this.kmsService.storeWalletVersionMetadata(versionMetadata);
 
-      console.log(`\n✅ Standard Wallet Created Successfully!`);
+      console.log(`\n Standard Wallet Created Successfully!`);
       console.log(`   Wallet ID: ${walletId}`);
       console.log(`   Version: v${version}`);
       console.log(`   Public Key: 0x${publicKeyHex}`);
-      console.log(`   🔄 Key rotation enabled (rotate annually for compliance)\n`);
+      console.log(`    Key rotation enabled (rotate annually for compliance)\n`);
       
       return {
         walletId,
@@ -69,7 +69,7 @@ export class SigningService {
         metadata: metadata || {}
       };
     } catch (error) {
-      console.error('❌ Generate Wallet Error:', error);
+      console.error(' Generate Wallet Error:', error);
       throw new Error(`Failed to generate wallet: ${error}`);
     }
   }
@@ -86,7 +86,7 @@ export class SigningService {
       const versionMetadata = await this.kmsService.getWalletVersionMetadata(walletId);
       const version = versionMetadata ? versionMetadata.currentVersion : 1;
 
-      console.log(`📝 Signing with ${walletId} v${version}`);
+      console.log(` Signing with ${walletId} v${version}`);
 
       // Retrieve and decrypt private key from active version
       const privateKeyHex = await this.kmsService.getVersionedPrivateKey(walletId, version);
@@ -107,7 +107,7 @@ export class SigningService {
       privateKey.fill(0);
       keypair.secretKey.fill(0);
 
-      console.log(`✅ Signed message with wallet ${walletId} v${version}`);
+      console.log(` Signed message with wallet ${walletId} v${version}`);
 
       return {
         signature: `0x${signatureHex}`,
@@ -141,7 +141,7 @@ export class SigningService {
    */
   async getPublicKey(walletId: string): Promise<string> {
     try {
-      console.log(`📖 Retrieving public key for ${walletId} (fast lookup)`);
+      console.log(` Retrieving public key for ${walletId} (fast lookup)`);
       
       // Get active version
       const versionMetadata = await this.kmsService.getWalletVersionMetadata(walletId);
@@ -152,7 +152,7 @@ export class SigningService {
       // Try metadata first (fast - no decryption!)
       try {
         const metadata = await this.kmsService.getPublicKeyMetadata(versionedWalletId);
-        console.log(`   ✅ Retrieved from metadata (~50ms) [v${version}]`);
+        console.log(`    Retrieved from metadata (~50ms) [v${version}]`);
         return metadata.publicKey;
       } catch (metadataError) {
         // Fallback: reconstruct from private key

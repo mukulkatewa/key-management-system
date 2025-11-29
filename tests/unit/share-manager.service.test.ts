@@ -1,7 +1,7 @@
 import { ShareManagerService } from '../../src/services/mpc/share-manager.service';
 import { KMSService } from '../../src/services/kms.service';
 
-// ✅ Mock the entire module before importing
+//  Mock the entire module before importing
 jest.mock('secrets.js-grempe', () => ({
   share: jest.fn(),
   combine: jest.fn()
@@ -35,7 +35,7 @@ describe('ShareManagerService', () => {
       const privateKey = 'abcdef1234567890';
       const mockShares = ['share1hex', 'share2hex', 'share3hex'];
       
-      // ✅ Now this will work
+      //  Now this will work
       (secrets.share as jest.Mock).mockReturnValue(mockShares);
       mockKmsService.storePrivateKey = jest.fn().mockResolvedValue(undefined);
 

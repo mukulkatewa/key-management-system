@@ -13,7 +13,7 @@ echo -e "${BLUE}║   MPC (Multi-Party Computation) Demo Test Suite   ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════╝${NC}"
 echo ""
 
-echo -e "${YELLOW}🔒 MPC Security: Shamir's Secret Sharing (2-of-3)${NC}"
+echo -e "${YELLOW} MPC Security: Shamir's Secret Sharing (2-of-3)${NC}"
 echo -e "${YELLOW}   - Private key split into 3 shares${NC}"
 echo -e "${YELLOW}   - Need only 2 shares to sign${NC}"
 echo -e "${YELLOW}   - Single share compromise = funds still safe${NC}"
@@ -38,7 +38,7 @@ WALLET_RESPONSE=$(curl -s -X POST $API_URL/mpc/wallets/generate \
   }')
 echo $WALLET_RESPONSE | python3 -m json.tool
 WALLET_ID=$(echo $WALLET_RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin)['wallet']['walletId'])" 2>/dev/null)
-echo -e "${BLUE}✅ Created MPC Wallet: $WALLET_ID${NC}\n"
+echo -e "${BLUE} Created MPC Wallet: $WALLET_ID${NC}\n"
 
 # Test 3: Sign Message with MPC
 echo -e "${GREEN}[Test 3/5] Sign Message Using MPC (2-of-3 shares)${NC}"
@@ -75,15 +75,15 @@ curl -s $API_URL/mpc/wallets/$WALLET_ID/public-key | python3 -m json.tool
 echo -e "\n"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║              ✅ All MPC Tests Passed!               ║${NC}"
+echo -e "${GREEN}║               All MPC Tests Passed!               ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${YELLOW}MPC Security Benefits Demonstrated:${NC}"
-echo "✅ Private key never stored whole (split into 3 shares)"
-echo "✅ Only 2-of-3 shares needed for signing"
-echo "✅ Shamir's Secret Sharing algorithm"
-echo "✅ All shares encrypted in AWS Secrets Manager"
-echo "✅ Key reconstructed only in-memory during signing"
-echo "✅ Key immediately destroyed after signature"
-echo "✅ No single point of failure"
+echo " Private key never stored whole (split into 3 shares)"
+echo " Only 2-of-3 shares needed for signing"
+echo " Shamir's Secret Sharing algorithm"
+echo " All shares encrypted in AWS Secrets Manager"
+echo " Key reconstructed only in-memory during signing"
+echo " Key immediately destroyed after signature"
+echo " No single point of failure"
 echo ""

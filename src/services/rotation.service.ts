@@ -24,7 +24,7 @@ export class RotationService {
     oldPublicKey: string;
     gracePeriodDays: number;
   }> {
-    console.log(`\n🔄 Starting wallet rotation for: ${walletId}`);
+    console.log(`\n Starting wallet rotation for: ${walletId}`);
     console.log(`   Reason: ${reason || 'Manual rotation'}`);
 
     // 1. Get current version metadata
@@ -45,7 +45,7 @@ export class RotationService {
     const privateKeyHex = Buffer.from(keypair.secretKey).toString('hex');
     const newPublicKeyHex = Buffer.from(keypair.publicKey).toString('hex');
 
-    console.log(`   ✅ Generated new Ed25519 keypair`);
+    console.log(`    Generated new Ed25519 keypair`);
     console.log(`   New Public Key: 0x${newPublicKeyHex}`);
 
     // 3. Store new versioned private key
@@ -95,7 +95,7 @@ export class RotationService {
 
     await this.kmsService.storeWalletVersionMetadata(versionMetadata);
 
-    console.log(`\n✅ Wallet Rotation Complete!`);
+    console.log(`\n Wallet Rotation Complete!`);
     console.log(`   Wallet: ${walletId}`);
     console.log(`   Old version (v${currentVersion}): Deprecated (30 day grace period)`);
     console.log(`   New version (v${newVersion}): Active`);
@@ -162,7 +162,7 @@ export class RotationService {
    * Delete old version (hard delete after grace period)
    */
   async deleteOldVersion(walletId: string, version: number): Promise<void> {
-    console.log(`🗑️  Deleting old version: ${walletId}-v${version}`);
+    console.log(`️  Deleting old version: ${walletId}-v${version}`);
     
     // Update metadata to mark as deleted
     const versionMetadata = await this.kmsService.getWalletVersionMetadata(walletId);
@@ -172,7 +172,7 @@ export class RotationService {
       await this.kmsService.storeWalletVersionMetadata(versionMetadata);
     }
 
-    console.log(`✅ Marked version ${version} as deleted in metadata`);
+    console.log(` Marked version ${version} as deleted in metadata`);
     console.log(`   Note: AWS Secrets Manager has recovery period (7-30 days)`);
   }
 
@@ -180,7 +180,7 @@ export class RotationService {
    * Migrate legacy wallet to versioned system
    */
   async migrateLegacyWallet(walletId: string): Promise<void> {
-    console.log(`\n🔄 Migrating legacy wallet to versioned system: ${walletId}`);
+    console.log(`\n Migrating legacy wallet to versioned system: ${walletId}`);
 
     // Check if already migrated
     const existing = await this.kmsService.getWalletVersionMetadata(walletId);
@@ -215,6 +215,6 @@ export class RotationService {
 
     await this.kmsService.storeWalletVersionMetadata(versionMetadata);
 
-    console.log(`✅ Migration complete: ${walletId} is now v1`);
+    console.log(` Migration complete: ${walletId} is now v1`);
   }
 }

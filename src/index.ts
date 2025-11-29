@@ -25,9 +25,8 @@ const rotationService = new RotationService();
 // Register rate limiting plugin globally (100 requests per 5 minutes)
 fastify.register(rateLimit, rateLimitConfig);
 
-// ============================================================================
+
 // STANDARD ENDPOINTS (Single-Key KMS)
-// ============================================================================
 
 // Health check (no auth required, lenient rate limit)
 fastify.get('/health', { 
@@ -173,9 +172,7 @@ fastify.get('/wallets', {
   }
 });
 
-// ============================================================================
 // WALLET ROTATION ENDPOINTS
-// ============================================================================
 
 // Rotate wallet to new version
 fastify.post<{
@@ -264,9 +261,7 @@ fastify.post<{
   }
 });
 
-// ============================================================================
 // MPC ENDPOINTS (Multi-Party Computation with Threshold Signatures)
-// ============================================================================
 
 // MPC Status endpoint
 fastify.get('/mpc/status', {
@@ -430,27 +425,25 @@ fastify.get<{
   }
 });
 
-// ============================================================================
 // SERVER STARTUP
-// ============================================================================
 
 const start = async () => {
   try {
     const port = parseInt(process.env.PORT || '3000');
     await fastify.listen({ port, host: '0.0.0.0' });
     
-    const authEnabled = process.env.API_KEY ? '🔒 Enabled' : '⚠️  Disabled (Dev Mode)';
-    const mpcStatus = isMPCEnabled() ? '🔐 Enabled (2-of-3)' : '⚠️  Disabled';
+    const authEnabled = process.env.API_KEY ? ' Enabled' : '⚠️  Disabled (Dev Mode)';
+    const mpcStatus = isMPCEnabled() ? ' Enabled (2-of-3)' : '⚠️  Disabled';
     
     console.log(`
-🚀 Hyperliquid KMS Service Running!
-📍 Server: http://localhost:${port}
-🔐 KMS Key: ${process.env.AWS_KMS_KEY_ID}
-🌍 Region: ${process.env.AWS_REGION}
-🔑 API Auth: ${authEnabled}
-🔒 MPC Mode: ${mpcStatus}
-🚦 Rate Limiting: Enabled (100 req / 5 min globally)
-🔄 Key Rotation: Enabled (annual rotation recommended)
+ Hyperliquid KMS Service Running!
+ Server: http://localhost:${port}
+ KMS Key: ${process.env.AWS_KMS_KEY_ID}
+ Region: ${process.env.AWS_REGION}
+ API Auth: ${authEnabled}
+ MPC Mode: ${mpcStatus}
+ Rate Limiting: Enabled (100 req / 5 min globally)
+ Key Rotation: Enabled (annual rotation recommended)
 
 Rate Limits (per 5 minutes):
   - Global: 100 requests
