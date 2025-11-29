@@ -593,49 +593,6 @@ await this.submitToHyperliquid(orderPayload, signature);
 }
 
 
-## Project Structure
-
-```
-key-management-service/
-├── src/
-│   ├── config/
-│   │   ├── aws.config.ts
-│   │   └── mpc.config.ts
-│   │
-│   ├── middleware/
-│   │   └── auth.middleware.ts
-│   │
-│   ├── services/
-│   │   ├── kms.service.ts
-│   │   ├── signing.service.ts
-│   │   └── mpc/
-│   │       ├── share-manager.service.ts
-│   │       └── mpc-signing.service.ts
-│   │
-│   ├── models/
-│   │   └── wallet.model.ts
-│   │
-│   └── index.ts
-│
-├── demo-bot/
-│   ├── hyperliquid-bot.ts
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── tests/
-│   ├── demo-test.sh
-│   └── mpc-demo-test.sh
-│
-├── .env
-├── .env.example
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── Dockerfile
-└── README.md
-```
-
-
 ## Production Deployment
 
 ### Docker Deployment
