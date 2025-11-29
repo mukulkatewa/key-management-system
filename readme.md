@@ -273,6 +273,10 @@ Create a new wallet with initial version `v1`.
     "label": "Production Bot 1"
   }
 }
+```
+
+**Response**
+
 ```json
 {
   "success": true,
@@ -282,15 +286,24 @@ Create a new wallet with initial version `v1`.
     "createdAt": "2025-11-29T21:43:41.457Z"
   }
 }
-#### Sign Message
-POST /wallets/sign
-Headers: X-API-Key: <your-api-key>
-Content-Type: application/json
+```
 
+#### Sign Message
+
+`POST /wallets/sign`
+
+Headers:
+
+- `X-API-Key: <your-api-key>`
+- `Content-Type: application/json`
+
+```json
 {
-"walletId": "my-wallet",
-"message": "transaction_data"
+  "walletId": "my-wallet",
+  "message": "transaction_data"
 }
+```
+
 #### Sign Hyperliquid Order
 POST /wallets/sign-order
 Headers: X-API-Key: <your-api-key>
